@@ -1,7 +1,7 @@
 package com.example.batalla_naval.Model;
 import java.io.Serializable;
 
-public class Cell {
+public class Cell implements Serializable{
     private int row, column;
     private CStatus status;
     private Ship ship;
@@ -22,6 +22,10 @@ public class Cell {
 
     public void setStatus(CStatus status) {
         this.status = status;
+    }
+
+    public CStatus getStatus() {
+        return status;
     }
 
     public Ship getShip() {

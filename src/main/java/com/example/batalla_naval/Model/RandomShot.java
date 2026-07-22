@@ -2,14 +2,14 @@ package com.example.batalla_naval.Model;
 
 public class RandomShot implements ShootStrategy {
 
+    @Override
     public int[] chooseTarget(Board enemyBoard){
-        int f = (int)(Math.random()*10);
-        int c = (int)(Math.random()*10);
+        int f, c;
+        do {
+            f = (int)(Math.random()*10);
+            c = (int)(Math.random()*10);
+        } while(enemyBoard.isShot(f, c));
 
-        int[] target = new int[2];
-        target[0] = f;
-        target[1] = c;
-
-        return target;
+        return new int[]{ f, c };
     }
 }
