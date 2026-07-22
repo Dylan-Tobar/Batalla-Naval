@@ -1,34 +1,38 @@
 package com.example.batalla_naval.Model;
-import java.io.Serializable;
 import java.util.ArrayList;
 
-public class Fleet implements ShipComponent{
+public class Fleet implements ShipComponent {
     private ArrayList<Ship> ships;
 
     public Fleet(){
         this.ships = new ArrayList<>();
     }
 
+    @Override
     public boolean isSunk(){
-        for(int i = 0; i < ships.size(); i++){
-            if(ships.get(i).isSunk() == false){
+        for(Ship ship : ships){
+            if(!ship.isSunk()){
                 return false;
             }
         }
         return true;
+    }
+
+    public boolean isDefeated(){
+        return isSunk();
+    }
+
+    @Override
+    public int getSize(){
+        int total = 0;
+        for(Ship ship : ships){
+            total += ship.getSize();
+        }
+        return total;
     }
 
     public void addShip(Ship ship){
         ships.add(ship);
-    }
-
-    public boolean isDefeated(){
-        for(int i = 0; i < ships.size(); i++){
-            if(ships.get(i).isSunk() == false){
-                return false;
-            }
-        }
-        return true;
     }
 
     public ArrayList<Ship> getShips(){

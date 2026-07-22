@@ -1,9 +1,6 @@
 package com.example.batalla_naval.Model;
 import java.io.IOException;
-import java.util.ArrayDeque;
-import java.util.Deque;
-import java.util.LinkedList;
-import java.util.Queue;
+import java.util.*;
 
 public class Game {
     private HumanP humaP;
@@ -22,6 +19,33 @@ public class Game {
         this.end = false;
     }
 
+    private Game(GameState state){
+        this.humaP = state.getHumanPlayer();
+        this.mPlayer = state.getMachinePlayer();
+        this.end = state.isEnd();
+        this.history = new ArrayDeque<>(state.getHistory());
+
+        if(state.getCurrentTurnPlayerName().equals(humaP.getName())){
+            turnQueue.add(humaP);
+            turnQueue.add(mPlayer);
+        } else {
+            turnQueue.add(mPlayer);
+            turnQueue.add(humaP);
+        }
+        this.cTurn = turnQueue.peek();
+    }
+
+    public static Game loadOrCreate(String humanName, String machineName){
+        try {
+            GameState saved = PersistenceService.loadGame();
+            if(saved != null && !saved.isEnd()){
+                return new Game(saved);
+            }
+        } catch (IOException | ClassNotFoundException e) {
+            System.out.println("No se pudo cargar la partida guardada, se inicia una nueva");
+        }
+        return new Game(humanName, machineName);
+    }
 
     public void changeT(){
         Player next = turnQueue.poll();
@@ -35,9 +59,32 @@ public class Game {
         }
     }
 
+
+    public Player getWinner(){
+        if(!end){
+            return null;
+        }
+        if(humaP.getBoard().getFleet().isDefeated()){
+            return mPlayer;
+        }
+        if(mPlayer.getBoard().getFleet().isDefeated()){
+            return humaP;
+        }
+        return null;
+    }
+
+    // Punto 9: se expone el history en vez de dejarlo "muerto" (solo push, nunca leído)
+    public List<Movement> getHistory(){
+        return new ArrayList<>(history);
+    }
+
     public CStatus humanShot(int c, int r){
         if(end){
             throw new GameOverException("La partida ya terminó");
+        }
+        // Punto 12: enforcement de turno dentro del Model
+        if(cTurn != humaP){
+            throw new IllegalStateException("No es el turno del jugador humano");
         }
 
         CStatus result = mPlayer.getBoard().shoot(r, c);
@@ -55,7 +102,7 @@ public class Game {
         history.push(new Movement(r, c, result, humaP.getName()));
 
         try{
-            PersistenceService.saveGame(new GameState(humaP.getBoard(), mPlayer.getBoard(), end));
+            PersistenceService.saveGame(new GameState(humaP, mPlayer, end, cTurn.getName(), history));
             PersistenceService.saveRecord(humaP.getName(), humaP.getSunkSCount());
         } catch(IOException e){
             System.out.println("Error al guardar la partida");
@@ -67,6 +114,10 @@ public class Game {
     public CStatus machineShot(){
         if(end){
             throw new GameOverException("La partida ya terminó");
+        }
+        // Punto 12: enforcement de turno dentro del Model
+        if(cTurn != mPlayer){
+            throw new IllegalStateException("No es el turno de la máquina");
         }
 
         int[] target = mPlayer.chooseTarget(humaP.getBoard());
@@ -94,7 +145,7 @@ public class Game {
         history.push(new Movement(r, c, resultM, mPlayer.getName()));
 
         try{
-            PersistenceService.saveGame(new GameState(humaP.getBoard(), mPlayer.getBoard(), end));
+            PersistenceService.saveGame(new GameState(humaP, mPlayer, end, cTurn.getName(), history));
             PersistenceService.saveRecord(humaP.getName(), humaP.getSunkSCount());
         } catch(IOException e){
             System.out.println("Error al guardar la partida");
@@ -121,13 +172,7 @@ public class Game {
             while(!p){
                 int r = (int)(Math.random()*10);
                 int c = (int)(Math.random()*10);
-                Orientation randomOr;
-
-                if(Math.random() < 0.5){
-                    randomOr = Orientation.HORIZONTAL;
-                } else {
-                    randomOr = Orientation.VERTICAL;
-                }
+                Orientation randomOr = Math.random() < 0.5 ? Orientation.HORIZONTAL : Orientation.VERTICAL;
 
                 Ship ship = ShipFactory.createShip(types[i], randomOr);
 
@@ -141,21 +186,8 @@ public class Game {
         }
     }
 
-    public HumanP getHumaP(){
-        return humaP;
-    }
-
-    public MachineP getmPlayer(){
-        return mPlayer;
-    }
-
-    public Player getcTurn(){
-        return cTurn;
-    }
-
-    public boolean isEnd(){
-        return end;
-    }
-
-
+    public HumanP getHumaP(){ return humaP; }
+    public MachineP getmPlayer(){ return mPlayer; }
+    public Player getcTurn(){ return cTurn; }
+    public boolean isEnd(){ return end; }
 }
