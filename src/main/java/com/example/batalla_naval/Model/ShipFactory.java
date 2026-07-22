@@ -23,6 +23,6 @@ public class ShipFactory {
                 break;
         }
 
-        return new Ship(size, or);
+        return new Ship(size, or, type);
     }
 }

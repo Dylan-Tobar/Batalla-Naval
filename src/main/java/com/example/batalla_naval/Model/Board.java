@@ -3,7 +3,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.io.Serializable;
 
-public class Board {
+public class Board implements Serializable {
     private Cell[][] grid;
     private Fleet fleet;
     private Map<ShipType, Integer> shipCount = new HashMap<>();
@@ -39,6 +39,10 @@ public class Board {
     }
 
     public boolean placeShip(Ship ship, int initialR, int initialC) throws InvPosException {
+        if(!canPlaceType(ship.getType())){
+            throw new InvPosException("Ya se alcanzó el máximo de barcos de tipo " + ship.getType());
+        }
+
         for(int i=0;i<ship.getSize();i++){
             int targetR = initialR;
             int targetC = initialC;
@@ -50,11 +54,11 @@ public class Board {
             }
 
             if(targetR<0 || targetR>9 || targetC<0 || targetC>9){
-                return false;
+                throw new InvPosException("La posición se sale del tablero");
             }
 
             if(grid[targetR][targetC].getShip() != null){
-                throw new InvPosException("La posición se sale del tablero");
+                throw new OccupiedCellException("Ya hay un barco en la celda (" + targetR + "," + targetC + ")");
             }
         }
 
@@ -74,26 +78,50 @@ public class Board {
         }
 
         fleet.addShip(ship);
+        registerShipType(ship.getType());
 
         return true;
     }
 
-    public CStatus shoot(int r, int c){
+    public boolean isReady(){
 
-        if(grid[r][c].getShip() == null){
-            grid[r][c].setStatus(CStatus.WATER);
-            return CStatus.WATER;
-        } else {
-            grid[r][c].getShip().hit();
+        return shipCount.getOrDefault(ShipType.AIRCRAFT_CARRIER,0) == 1 &&
+                shipCount.getOrDefault(ShipType.SUBMARINE,0) == 2 &&
+                shipCount.getOrDefault(ShipType.DESTROYER,0) == 3 &&
+                shipCount.getOrDefault(ShipType.FRIGATE,0) == 4;
 
-            if(grid[r][c].getShip().isSunk() == true){
-                grid[r][c].setStatus(CStatus.DROWNED);
-                return CStatus.DROWNED;
-            } else {
-                grid[r][c].setStatus(CStatus.TOUCHED);
-                return CStatus.TOUCHED;
-            }
+    }
+
+    public CStatus shoot(int r, int c) {
+
+        if (isShot(r, c)) {
+            throw new AlreadyShotException("La celda (" + r + "," + c + ") ya fue disparada");
         }
+
+        Cell cell = grid[r][c];
+
+        if (cell.getShip() == null) {
+            cell.setStatus(CStatus.WATER);
+            return CStatus.WATER;
+        }
+
+        Ship ship = cell.getShip();
+        ship.hit();
+
+        if (ship.isSunk()) {
+            for (Cell cShip : ship.getCells()) {
+                cShip.setStatus(CStatus.DROWNED);
+            }
+            return CStatus.DROWNED;
+        } else {
+            cell.setStatus(CStatus.TOUCHED);
+            return CStatus.TOUCHED;
+        }
+    }
+
+    public boolean isShot(int r, int c){
+        CStatus status = grid[r][c].getStatus();
+        return status == CStatus.WATER || status == CStatus.TOUCHED || status == CStatus.DROWNED;
     }
 
     public Cell[][] getGrid(){
