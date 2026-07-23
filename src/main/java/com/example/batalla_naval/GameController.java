@@ -20,11 +20,13 @@ import com.example.batalla_naval.Model.Ship;
 import com.example.batalla_naval.Model.ShipFactory;
 import com.example.batalla_naval.Model.ShipType;
 
+import javafx.animation.PauseTransition;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.input.*;
 import javafx.scene.layout.*;
+import javafx.util.Duration;
 
 import java.io.IOException;
 import java.util.List;
@@ -258,7 +260,10 @@ public class GameController {
     private void executeMachineTurn() {
         if (game.isEnd()) return;
 
-        Platform.runLater(() -> {
+        statusLabel.setText("🤖 La máquina está disparando...");
+
+        PauseTransition pause = new PauseTransition(Duration.millis(600));
+        pause.setOnFinished(e -> {
             try {
                 CStatus resultM = game.machineShot();
                 logListView.getItems().add(0, "Máquina disparó: " + getStatusText(resultM));
@@ -266,15 +271,19 @@ public class GameController {
                 checkGameEnd();
 
                 if (!game.isEnd() && game.getcTurn() == game.getmPlayer()) {
-                    // Si la máquina acertó, vuelve a disparar
+                    // Si la máquina acertó, vuelve a disparar (con la misma pausa)
                     executeMachineTurn();
                 } else {
                     turnLabel.setText("Turno: " + game.getcTurn().getName());
+                    if (!game.isEnd()) {
+                        statusLabel.setText("Tu turno: haz clic en el tablero enemigo para disparar.");
+                    }
                 }
-            } catch (Exception e) {
-                System.out.println("Error en turno de la máquina: " + e.getMessage());
+            } catch (Exception ex) {
+                System.out.println("Error en turno de la máquina: " + ex.getMessage());
             }
         });
+        pause.play();
     }
 
     private void handleStartGame() {
@@ -283,8 +292,6 @@ public class GameController {
             return;
         }
 
-        // Colocar barcos de la máquina de forma aleatoria
-        game.placeMShipsR();
         gameStarted = true;
 
         btnStartGame.setDisable(true);
@@ -345,6 +352,7 @@ public class GameController {
 
     private void startFreshGame() {
         game = new Game("Jugador 1", "Máquina");
+        game.placeMShipsR(); // Se coloca desde ya para que "Ver Tablero Oponente" muestre algo real en Modo Pruebas
         gameStarted = false;
         showingOpponentFleet = false;
         btnStartGame.setDisable(true);
