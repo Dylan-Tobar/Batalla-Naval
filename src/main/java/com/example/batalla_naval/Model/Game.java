@@ -234,8 +234,6 @@ public class Game {
             throw new IllegalStateException("Debes completar tu flota antes de iniciar la partida");
         }
 
-        placeMShipsR();
-
         humaP.getBoard().lock();
         mPlayer.getBoard().lock();
         started = true;
