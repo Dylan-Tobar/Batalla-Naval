@@ -1,0 +1,121 @@
+/* ESTILOS BATALLA NAVAL */
+
+.root {
+    -fx-font-family: 'Segoe UI', Helvetica, Arial, sans-serif;
+}
+
+/* Celdas de tablero */
+.grid-cell {
+    -fx-min-width: 32px;
+    -fx-min-height: 32px;
+    -fx-pref-width: 32px;
+    -fx-pref-height: 32px;
+    -fx-max-width: 32px;
+    -fx-max-height: 32px;
+    -fx-background-color: #0f172a;
+    -fx-border-color: #334155;
+    -fx-border-width: 1px;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-alignment: center;
+    -fx-cursor: hand;
+    -fx-background-radius: 2px;
+    -fx-border-radius: 2px;
+}
+
+.grid-cell:hover {
+    -fx-background-color: #1e293b;
+    -fx-border-color: #38bdf8;
+}
+
+/* Celda con barco propio */
+.cell-ship {
+    -fx-background-color: #475569;
+    -fx-border-color: #94a3b8;
+    -fx-text-fill: #ffffff;
+}
+
+/* Celda con barco oponente revelado en pre-juego (HU-3) */
+.cell-opponent-ship {
+    -fx-background-color: #be123c;
+    -fx-border-color: #f43f5e;
+    -fx-text-fill: #ffffff;
+}
+
+/* Disparo a agua */
+.cell-water {
+    -fx-background-color: #0284c7;
+    -fx-border-color: #38bdf8;
+    -fx-text-fill: #ffffff;
+}
+
+/* Disparo a barco (Tocado) */
+.cell-touched {
+    -fx-background-color: #ea580c;
+    -fx-border-color: #fb923c;
+    -fx-text-fill: #ffffff;
+}
+
+/* Barco Hundido */
+.cell-sunk {
+    -fx-background-color: #991b1b;
+    -fx-border-color: #ef4444;
+    -fx-text-fill: #ffffff;
+}
+
+/* Efecto al arrastrar sobre celda (Drag Over) */
+.cell-drag-over {
+    -fx-background-color: #0369a1;
+    -fx-border-color: #38bdf8;
+    -fx-border-width: 2px;
+}
+
+/* Botones principales */
+.action-button {
+    -fx-background-color: #0284c7;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-font-size: 13px;
+    -fx-padding: 8px 16px;
+    -fx-background-radius: 6px;
+    -fx-cursor: hand;
+}
+
+.action-button:hover {
+    -fx-background-color: #0369a1;
+}
+
+.secondary-button {
+    -fx-background-color: #475569;
+    -fx-text-fill: white;
+    -fx-font-size: 12px;
+    -fx-padding: 6px 12px;
+    -fx-background-radius: 6px;
+    -fx-cursor: hand;
+}
+
+.secondary-button:hover {
+    -fx-background-color: #334155;
+}
+
+/* Overlay de victoria */
+.winner-overlay {
+    -fx-background-color: rgba(15, 23, 42, 0.88);
+    -fx-padding: 30px;
+    -fx-background-radius: 12px;
+}
+
+/* Elemento arrastable en el panel de colocación */
+.draggable-ship-item {
+    -fx-background-color: #e2e8f0;
+    -fx-border-color: #cbd5e1;
+    -fx-border-radius: 6px;
+    -fx-background-radius: 6px;
+    -fx-padding: 8px;
+    -fx-cursor: open-hand;
+}
+
+.draggable-ship-item:hover {
+    -fx-background-color: #cbd5e1;
+    -fx-border-color: #0284c7;
+}
