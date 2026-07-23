@@ -1,6 +1,25 @@
 package com.example.batalla_naval;
 
-import com.example.batalla_naval.Model.*;
+import com.example.batalla_naval.Model.AlreadyShotException;
+import com.example.batalla_naval.Model.Board;
+import com.example.batalla_naval.Model.CStatus;
+import static com.example.batalla_naval.Model.CStatus.*;
+import com.example.batalla_naval.Model.Cell;
+import com.example.batalla_naval.Model.Game;
+import com.example.batalla_naval.Model.GameOverException;
+import com.example.batalla_naval.Model.GameState;
+import com.example.batalla_naval.Model.HumanP;
+import com.example.batalla_naval.Model.InvPosException;
+import com.example.batalla_naval.Model.MachineP;
+import com.example.batalla_naval.Model.Movement;
+import com.example.batalla_naval.Model.OccupiedCellException;
+import com.example.batalla_naval.Model.Orientation;
+import com.example.batalla_naval.Model.PersistenceService;
+import com.example.batalla_naval.Model.Player;
+import com.example.batalla_naval.Model.Ship;
+import com.example.batalla_naval.Model.ShipFactory;
+import com.example.batalla_naval.Model.ShipType;
+
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -348,7 +367,7 @@ public class GameController {
         List<Movement> hist = game.getHistory();
         for (int i = hist.size() - 1; i >= 0; i--) {
             Movement m = hist.get(i);
-            logListView.getItems().add(0, m.getPlayerName() + " disparó a (" + m.getRow() + ", " + m.getCol() + "): " + getStatusText(m.getResult()));
+            logListView.getItems().add(0, m.getPlayerName() + " disparó a (" + m.getRow() + ", " + m.getColumn() + "): " + getStatusText(m.getResult()));
         }
 
         // Si la flota humana ya estaba completa al guardar
