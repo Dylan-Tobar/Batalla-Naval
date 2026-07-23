@@ -1,16 +1,13 @@
-package com.example.batalla_naval;
+package com.example.batalla_naval.Controllers;
 
 import com.example.batalla_naval.Model.AlreadyShotException;
 import com.example.batalla_naval.Model.Board;
 import com.example.batalla_naval.Model.CStatus;
-import static com.example.batalla_naval.Model.CStatus.*;
 import com.example.batalla_naval.Model.Cell;
 import com.example.batalla_naval.Model.Game;
 import com.example.batalla_naval.Model.GameOverException;
 import com.example.batalla_naval.Model.GameState;
-import com.example.batalla_naval.Model.HumanP;
 import com.example.batalla_naval.Model.InvPosException;
-import com.example.batalla_naval.Model.MachineP;
 import com.example.batalla_naval.Model.Movement;
 import com.example.batalla_naval.Model.OccupiedCellException;
 import com.example.batalla_naval.Model.Orientation;
@@ -26,10 +23,17 @@ import javafx.scene.control.*;
 import javafx.scene.input.*;
 import javafx.scene.layout.*;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * @autor Dylan Tobar, Ricardo Hallado, Alejandro Arias
+ * @version 1.0
+ * JavaFX controller for the main game screen. Connects the FXML
+ * view with the {@link Game} model: builds the two boards, handles
+ * ship placement (drag and drop or click), player and machine
+ * shots, and shows the current game status on screen.
+ */
 public class GameController {
 
     @FXML private StackPane rootPane;
@@ -61,13 +65,16 @@ public class GameController {
     private final Button[][] humanButtons = new Button[10][10];
     private final Button[][] machineButtons = new Button[10][10];
 
+    /**
+     * Called automatically by JavaFX after the FXML is loaded.
+     * Sets up the ship type selector, the drag source, both board
+     * grids, the control buttons, and tries to load a saved match.
+     */
     @FXML
     public void initialize() {
-        // Inicializar ComboBox con tipos de barco
         shipTypeComboBox.getItems().addAll(ShipType.values());
         shipTypeComboBox.setValue(ShipType.AIRCRAFT_CARRIER);
 
-        // Formato para mostrar nombres legibles en ComboBox
         shipTypeComboBox.setCellFactory(param -> new ListCell<>() {
             @Override
             protected void updateItem(ShipType item, boolean empty) {
@@ -91,28 +98,26 @@ public class GameController {
             }
         });
 
-        // Configurar arrastre (Drag Source HU-1)
         setupDragSource();
 
-        // Construir cuadrículas de tableros
         buildGrids();
 
-        // Configurar botones de control
         btnStartGame.setOnAction(e -> handleStartGame());
         btnShowOpponent.setOnAction(e -> handleToggleShowOpponent());
         btnNewGame.setOnAction(e -> handleNewGame());
-
-        // Cargar o iniciar nueva partida al arrancar (HU-6)
         Platform.runLater(this::checkLoadSavedGame);
     }
 
+    /**
+     * Configures the drag source label so the user can start
+     * dragging the currently selected ship type onto their board.
+     */
     private void setupDragSource() {
         dragShipSource.setOnDragDetected(event -> {
             if (gameStarted) return;
             ShipType selectedType = shipTypeComboBox.getValue();
             if (selectedType == null) return;
 
-            // Verificar si aún se pueden colocar más barcos de este tipo
             if (!game.getHumaP().getBoard().canPlaceType(selectedType)) {
                 statusLabel.setText("⚠️ Ya colocaste el número máximo de " + getShipTypeDisplayName(selectedType));
                 return;
@@ -128,6 +133,10 @@ public class GameController {
         });
     }
 
+    /**
+     * Builds the two 10x10 grids of buttons (human and machine
+     * boards) and wires up their click and drag-and-drop handlers.
+     */
     private void buildGrids() {
         humanGrid.getChildren().clear();
         machineGrid.getChildren().clear();
@@ -137,16 +146,13 @@ public class GameController {
                 final int row = r;
                 final int col = c;
 
-                // Celda Humano
                 Button hBtn = new Button();
                 hBtn.getStyleClass().add("grid-cell");
                 setupHumanCellDragAndDrop(hBtn, row, col);
-                // También permitir clic directo para comodidad del usuario
                 hBtn.setOnAction(e -> handleHumanCellClick(row, col));
                 humanButtons[r][c] = hBtn;
                 humanGrid.add(hBtn, c, r);
 
-                // Celda Máquina
                 Button mBtn = new Button();
                 mBtn.getStyleClass().add("grid-cell");
                 mBtn.setOnAction(e -> handleMachineCellClick(row, col));
@@ -156,6 +162,13 @@ public class GameController {
         }
     }
 
+    /**
+     * Enables a single human-board cell to accept a dragged ship
+     * and attempt to place it when dropped.
+     * @param btn the button representing the cell
+     * @param row row of this cell
+     * @param col column of this cell
+     */
     private void setupHumanCellDragAndDrop(Button btn, int row, int col) {
         btn.setOnDragOver(event -> {
             if (!gameStarted && event.getDragboard().hasString()) {
@@ -190,6 +203,12 @@ public class GameController {
         });
     }
 
+    /**
+     * Handles a direct click on a human-board cell as an
+     * alternative way to place the currently selected ship.
+     * @param row row that was clicked
+     * @param col column that was clicked
+     */
     private void handleHumanCellClick(int row, int col) {
         if (gameStarted) return;
         ShipType selectedType = shipTypeComboBox.getValue();
@@ -198,6 +217,16 @@ public class GameController {
         attemptPlaceShip(selectedType, selectedOr, row, col);
     }
 
+    /**
+     * Tries to place a ship of the given type and orientation on
+     * the human board, updating the UI on success or showing an
+     * error message on failure.
+     * @param type ship type to place
+     * @param orientation orientation to place it in
+     * @param row starting row
+     * @param col starting column
+     * @return true if the ship was placed successfully
+     */
     private boolean attemptPlaceShip(ShipType type, Orientation orientation, int row, int col) {
         try {
             Ship ship = ShipFactory.createShip(type, orientation);
@@ -207,18 +236,28 @@ public class GameController {
             updateFleetCounts();
             renderHumanBoard();
 
-            // Si la flota está completa (10 barcos)
             if (game.getHumaP().getBoard().isReady()) {
                 btnStartGame.setDisable(false);
                 statusLabel.setText("🎉 ¡Flota completa! Presiona 'Iniciar Batalla' para comenzar.");
             }
             return true;
-        } catch (InvPosException | OccupiedCellException e) {
+
+        } catch (InvPosException e) {
             statusLabel.setText("❌ Error de colocación: " + e.getMessage());
+            return false;
+        } catch (IllegalStateException e) {
+
+            statusLabel.setText("⚠️ " + e.getMessage());
             return false;
         }
     }
 
+    /**
+     * Handles a click on a machine-board cell: fires a shot from
+     * the human player if it is their turn and the match is running.
+     * @param row row that was clicked
+     * @param col column that was clicked
+     */
     private void handleMachineCellClick(int row, int col) {
         if (!gameStarted) {
             statusLabel.setText("⚠️ Debes iniciar la partida primero.");
@@ -233,7 +272,6 @@ public class GameController {
         }
 
         try {
-            // OJO: humanShot recibe (columna, fila) -> (col, row)
             CStatus result = game.humanShot(col, row);
             String actionDesc = "Humano disparó a (" + row + ", " + col + "): " + getStatusText(result);
             logListView.getItems().add(0, actionDesc);
@@ -241,7 +279,6 @@ public class GameController {
             renderMachineBoard();
             checkGameEnd();
 
-            // Si el juego continúa y le toca a la máquina, ejecutar turno automático
             if (!game.isEnd() && game.getcTurn() == game.getmPlayer()) {
                 executeMachineTurn();
             }
@@ -255,6 +292,10 @@ public class GameController {
         }
     }
 
+    /**
+     * Executes the machine player's turn asynchronously, and keeps
+     * shooting again automatically while it keeps hitting ships.
+     */
     private void executeMachineTurn() {
         if (game.isEnd()) return;
 
@@ -266,7 +307,6 @@ public class GameController {
                 checkGameEnd();
 
                 if (!game.isEnd() && game.getcTurn() == game.getmPlayer()) {
-                    // Si la máquina acertó, vuelve a disparar
                     executeMachineTurn();
                 } else {
                     turnLabel.setText("Turno: " + game.getcTurn().getName());
@@ -277,14 +317,18 @@ public class GameController {
         });
     }
 
+    /**
+     * Handles the "Start Game" button: starts the match if the
+     * human fleet is complete, locking both boards.
+     */
     private void handleStartGame() {
-        if (!game.getHumaP().getBoard().isReady()) {
-            statusLabel.setText("⚠️ Coloca toda tu flota antes de iniciar.");
+        try {
+            game.startGame();
+        } catch (IllegalStateException e) {
+            statusLabel.setText("⚠️ " + e.getMessage());
             return;
         }
 
-        // Colocar barcos de la máquina de forma aleatoria
-        game.placeMShipsR();
         gameStarted = true;
 
         btnStartGame.setDisable(true);
@@ -293,6 +337,10 @@ public class GameController {
         statusLabel.setText("⚔ ¡La batalla ha comenzado! Haz clic en el tablero enemigo para disparar.");
     }
 
+    /**
+     * Handles the "Show Opponent Board" button: toggles whether the
+     * machine's fleet is revealed on screen for testing purposes.
+     */
     private void handleToggleShowOpponent() {
         showingOpponentFleet = !showingOpponentFleet;
         if (showingOpponentFleet) {
@@ -305,6 +353,10 @@ public class GameController {
         renderMachineBoard();
     }
 
+    /**
+     * Updates the turn label and, if the match has finished, shows
+     * the winner overlay with the result.
+     */
     private void checkGameEnd() {
         turnLabel.setText("Turno: " + game.getcTurn().getName());
         if (game.isEnd()) {
@@ -316,6 +368,10 @@ public class GameController {
         }
     }
 
+    /**
+     * Checks if there is a saved, unfinished match on disk and, if
+     * so, asks the user whether to resume it or start a new one.
+     */
     private void checkLoadSavedGame() {
         try {
             GameState saved = PersistenceService.loadGame();
@@ -343,6 +399,10 @@ public class GameController {
         startFreshGame();
     }
 
+    /**
+     * Starts a brand new match and resets the whole screen to the
+     * initial ship-placement state.
+     */
     private void startFreshGame() {
         game = new Game("Jugador 1", "Máquina");
         gameStarted = false;
@@ -359,24 +419,25 @@ public class GameController {
         statusLabel.setText("Arrastra o haz clic para colocar tus 10 barcos.");
     }
 
+    /**
+     * Rebuilds the whole screen (log, boards, buttons) to match a
+     * match that was just loaded from a saved state.
+     */
     private void restoreSavedGameState() {
         winnerOverlay.setVisible(false);
         logListView.getItems().clear();
 
-        // Restaurar historial
         List<Movement> hist = game.getHistory();
         for (int i = hist.size() - 1; i >= 0; i--) {
             Movement m = hist.get(i);
             logListView.getItems().add(0, m.getPlayerName() + " disparó a (" + m.getRow() + ", " + m.getColumn() + "): " + getStatusText(m.getResult()));
         }
 
-        // Si la flota humana ya estaba completa al guardar
-        if (game.getHumaP().getBoard().isReady()) {
-            gameStarted = true;
+        gameStarted = game.isStarted();
+        if (gameStarted) {
             btnStartGame.setDisable(true);
             btnShowOpponent.setVisible(false);
         } else {
-            gameStarted = false;
             btnStartGame.setDisable(!game.getHumaP().getBoard().isReady());
             btnShowOpponent.setVisible(true);
         }
@@ -387,10 +448,15 @@ public class GameController {
         checkGameEnd();
     }
 
+    /** Handles the "New Game" button by starting a fresh match. */
     private void handleNewGame() {
         startFreshGame();
     }
 
+    /**
+     * Redraws every cell of the human board according to its
+     * current status (empty, ship, water, touched or drowned).
+     */
     private void renderHumanBoard() {
         Cell[][] grid = game.getHumaP().getBoard().getGrid();
         for (int r = 0; r < 10; r++) {
@@ -425,6 +491,11 @@ public class GameController {
         }
     }
 
+    /**
+     * Redraws every cell of the machine board according to its
+     * current status, only revealing hidden ships when the "show
+     * opponent" test mode is active.
+     */
     private void renderMachineBoard() {
         Cell[][] grid = game.getmPlayer().getBoard().getGrid();
         for (int r = 0; r < 10; r++) {
@@ -463,6 +534,10 @@ public class GameController {
         }
     }
 
+    /**
+     * Updates the four labels that show how many ships of each
+     * type the human player has placed so far.
+     */
     private void updateFleetCounts() {
         Board humanBoard = game.getHumaP().getBoard();
 
@@ -472,6 +547,13 @@ public class GameController {
         frigateCountLabel.setText("Fragatas (1 celda): " + countPlaced(humanBoard, ShipType.FRIGATE) + "/4");
     }
 
+    /**
+     * Counts how many ships of the given type are already placed
+     * on the given board.
+     * @param board the board to inspect
+     * @param type the ship type to count
+     * @return number of ships of that type placed on the board
+     */
     private int countPlaced(Board board, ShipType type) {
         int count = 0;
         for (Ship s : board.getFleet().getShips()) {
@@ -482,6 +564,12 @@ public class GameController {
         return count;
     }
 
+    /**
+     * Returns a human-readable Spanish name (with cell count) for a
+     * ship type, used in labels and the ComboBox.
+     * @param type the ship type
+     * @return display text for that ship type
+     */
     private String getShipTypeDisplayName(ShipType type) {
         switch (type) {
             case AIRCRAFT_CARRIER: return "Portaaviones (4 celdas)";
@@ -492,6 +580,12 @@ public class GameController {
         }
     }
 
+    /**
+     * Returns a human-readable Spanish label for a shot result,
+     * used in the status label and the move log.
+     * @param status the shot result
+     * @return display text for that result
+     */
     private String getStatusText(CStatus status) {
         switch (status) {
             case WATER: return "Agua";
