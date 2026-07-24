@@ -14,8 +14,39 @@
     src: url("fonts/Bosman-Empty.otf");
 }
 
+/* Fuente Army Rangers: se usa para los textos pequeños/secundarios
+   (por ejemplo el subtitulo de la pantalla de bienvenida), como
+   contraste dinamico frente al Bosman Black del titulo grande */
+@font-face {
+    src: url("fonts/armyrangers.ttf");
+}
+@font-face {
+    src: url("fonts/armyrangersital.ttf");
+}
+
 .root {
     -fx-font-family: "Bosman Black";
+}
+
+/* Titulo principal de la pantalla de bienvenida: mucho mas grande y notorio */
+.hero-title {
+    -fx-font-family: "Bosman Black";
+    -fx-font-size: 46px;
+    -fx-text-fill: #f8fafc;
+}
+
+/* Subtitulo "La lucha contra el narcotrafico" bajo el titulo, con la
+   fuente Army Rangers en italica para darle un toque dinamico */
+.hero-tagline {
+    -fx-font-family: "Army Rangers Italic";
+    -fx-font-size: 15px;
+    -fx-text-fill: #f87171;
+}
+
+/* Texto pequeno con la fuente Army Rangers (p. ej. "Ingresa tu nombre
+   de comandante para empezar") */
+.army-text {
+    -fx-font-family: "Army Rangers";
 }
 
 /* Fondo con textura de mar profundo, repetida en mosaico */
@@ -233,6 +264,54 @@
     -fx-background-color: rgba(15, 23, 42, 0.88);
     -fx-padding: 30px;
     -fx-background-radius: 12px;
+}
+
+/* Registro de jugadas: transparente para dejar ver la textura de fondo,
+   con el mismo marco translucido que los tableros */
+.log-list {
+    -fx-background-color: transparent;
+    -fx-control-inner-background: transparent;
+    -fx-border-color: rgba(148, 163, 184, 0.45);
+    -fx-border-width: 2px;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+    -fx-padding: 4px;
+}
+
+.log-list .viewport,
+.log-list .scroll-pane {
+    -fx-background-color: transparent;
+}
+
+.log-list .list-cell {
+    -fx-background-color: transparent;
+    -fx-font-family: "Bosman Black";
+    -fx-font-size: 11px;
+    -fx-padding: 4px 6px;
+}
+
+.log-list .list-cell:filled:hover,
+.log-list .list-cell:filled:selected {
+    -fx-background-color: rgba(56, 189, 248, 0.15);
+}
+
+/* Colores segun el resultado de cada disparo del registro:
+   agua = blanco, toque propio = verde, hundido por mi = rojo,
+   y cuando la maquina me toca a mi = naranja */
+.log-cell-water {
+    -fx-text-fill: #f8fafc;
+}
+
+.log-cell-hit {
+    -fx-text-fill: #22c55e;
+}
+
+.log-cell-sunk {
+    -fx-text-fill: #ef4444;
+}
+
+.log-cell-hurt {
+    -fx-text-fill: #f97316;
 }
 
 /* Elemento arrastable en el panel de colocación */

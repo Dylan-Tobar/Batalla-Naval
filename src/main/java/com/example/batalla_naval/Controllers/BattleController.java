@@ -13,6 +13,7 @@ import javafx.animation.PauseTransition;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
@@ -34,7 +35,7 @@ public class BattleController {
     @FXML private Label statusLabel;
     @FXML private GridPane humanGrid;
     @FXML private GridPane machineGrid;
-    @FXML private ListView<String> logListView;
+    @FXML private ListView<LogEntry> logListView;
     @FXML private VBox winnerOverlay;
     @FXML private Label winnerLabel;
     @FXML private Button btnNewGame;
@@ -45,6 +46,15 @@ public class BattleController {
     private final Button[][] machineButtons = new Button[10][10];
 
     /**
+     * One line of the move log: its display text plus the CSS style
+     * class that colors it according to the shot's outcome (HU
+     * request: water = white, own hit = green, own sink = red,
+     * getting hit by the machine = orange).
+     */
+    private record LogEntry(String text, String styleClass) {
+    }
+
+    /**
      * Called automatically by JavaFX after the FXML is loaded.
      * Builds both board grids; the actual match arrives afterwards
      * through {@link #setGame(Game)}.
@@ -52,7 +62,28 @@ public class BattleController {
     @FXML
     public void initialize() {
         buildGrids();
+        setupLogListView();
         btnNewGame.setOnAction(e -> Navigator.goToWelcome());
+    }
+
+    /**
+     * Configures the move-log cells to render each entry with the
+     * color that matches its outcome, instead of plain default text.
+     */
+    private void setupLogListView() {
+        logListView.setCellFactory(lv -> new ListCell<>() {
+            @Override
+            protected void updateItem(LogEntry item, boolean empty) {
+                super.updateItem(item, empty);
+                getStyleClass().removeAll("log-cell-water", "log-cell-hit", "log-cell-sunk", "log-cell-hurt");
+                if (empty || item == null) {
+                    setText(null);
+                } else {
+                    setText(item.text());
+                    getStyleClass().add(item.styleClass());
+                }
+            }
+        });
     }
 
     /**
@@ -89,10 +120,32 @@ public class BattleController {
     private void restoreLogFromHistory() {
         logListView.getItems().clear();
         List<Movement> hist = game.getHistory();
+        String humanName = game.getHumaP().getName();
         for (int i = hist.size() - 1; i >= 0; i--) {
             Movement m = hist.get(i);
-            logListView.getItems().add(0, m.getPlayerName() + " disparó a (" + m.getRow() + ", " + m.getColumn() + "): " + getStatusText(m.getResult()));
+            boolean shooterIsHuman = m.getPlayerName().equals(humanName);
+            String text = m.getPlayerName() + " disparó a (" + m.getRow() + ", " + m.getColumn() + "): " + getStatusText(m.getResult());
+            logListView.getItems().add(0, new LogEntry(text, classifyLogEntry(m.getResult(), shooterIsHuman)));
         }
+    }
+
+    /**
+     * Picks the log line's color/style class for a shot's outcome:
+     * water is always white; a hit or sink made by the human player
+     * is green or red; anything the machine lands on the human
+     * ("me tocan a mí") is orange.
+     * @param result outcome of the shot
+     * @param shooterIsHuman whether the human player made this shot
+     * @return the CSS style class to color that log line
+     */
+    private String classifyLogEntry(CStatus result, boolean shooterIsHuman) {
+        if (result == CStatus.WATER) {
+            return "log-cell-water";
+        }
+        if (shooterIsHuman) {
+            return result == CStatus.DROWNED ? "log-cell-sunk" : "log-cell-hit";
+        }
+        return "log-cell-hurt";
     }
 
     /**
@@ -140,7 +193,8 @@ public class BattleController {
 
         try {
             CStatus result = game.humanShot(col, row);
-            logListView.getItems().add(0, "Humano disparó a (" + row + ", " + col + "): " + getStatusText(result));
+            String text = "Humano disparó a (" + row + ", " + col + "): " + getStatusText(result);
+            logListView.getItems().add(0, new LogEntry(text, classifyLogEntry(result, true)));
 
             renderMachineBoard();
             checkGameEnd();
@@ -171,7 +225,8 @@ public class BattleController {
         pause.setOnFinished(e -> {
             try {
                 CStatus resultM = game.machineShot();
-                logListView.getItems().add(0, "Máquina disparó: " + getStatusText(resultM));
+                String text = "Máquina disparó: " + getStatusText(resultM);
+                logListView.getItems().add(0, new LogEntry(text, classifyLogEntry(resultM, false)));
                 renderHumanBoard();
                 checkGameEnd();
 

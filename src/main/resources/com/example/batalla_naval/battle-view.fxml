@@ -41,7 +41,7 @@
                   <VBox prefWidth="220.0" spacing="8.0">
                      <children>
                         <Label style="-fx-font-weight: bold; -fx-font-size: 12px; -fx-text-fill: #f8fafc;" text="📜 Registro de Jugadas" />
-                        <ListView fx:id="logListView" VBox.vgrow="ALWAYS" />
+                        <ListView fx:id="logListView" styleClass="log-list" VBox.vgrow="ALWAYS" />
                      </children>
                   </VBox>
                </children>
