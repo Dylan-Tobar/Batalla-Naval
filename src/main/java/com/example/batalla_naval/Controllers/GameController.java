@@ -374,6 +374,32 @@ public class GameController {
             winnerLabel.setText(winnerText);
             winnerOverlay.setVisible(true);
             statusLabel.setText("🏁 " + winnerText);
+
+            showRecords();
+        }
+    }
+
+    /**
+     *  Read the record history saved in record.txty;
+     *  it is displayed in a pop-up window when the game ends.
+     */
+    private void showRecords() {
+        try {
+            List<String> records = PersistenceService.loadRecords();
+
+            String content = "";
+            for (int i = 0; i < records.size(); i++) {
+                content += records.get(i) + "\n";
+            }
+
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Récords");
+            alert.setHeaderText("Historial de partidas jugadas");
+            alert.setContentText(content.length() > 0 ? content : "Aún no hay récords guardados.");
+            alert.showAndWait();
+
+        } catch (Exception e) {
+            System.out.println("No se pudo leer los récords: " + e.getMessage());
         }
     }
 

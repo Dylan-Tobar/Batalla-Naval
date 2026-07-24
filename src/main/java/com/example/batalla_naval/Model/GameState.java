@@ -1,8 +1,7 @@
 package com.example.batalla_naval.Model;
 
 import java.io.Serializable;
-import java.util.ArrayDeque;
-import java.util.Deque;
+import java.util.Stack;
 
 /**
  * @autor Dylan Tobar, Ricardo Hallado, Alejandro Arias
@@ -17,8 +16,8 @@ public class GameState implements Serializable {
     private MachineP machinePlayer;
     private boolean end;
     private boolean started;
-    private String currentTurnPlayerName;
-    private Deque<Movement> history;
+    private String cTurnPName;
+    private Stack<Movement> history;
 
     /**
      * Creates a new saved-state snapshot.
@@ -26,17 +25,18 @@ public class GameState implements Serializable {
      * @param machinePlayer the machine player and their board
      * @param end whether the match has finished
      * @param started whether the match has started
-     * @param currentTurnPlayerName name of the player whose turn it is
+     * @param cTurnPName name of the player whose turn it is
      * @param history the move history so far
      */
     public GameState(HumanP humanPlayer, MachineP machinePlayer, boolean end, boolean started,
-                     String currentTurnPlayerName, Deque<Movement> history){
+                     String cTurnPName, Stack<Movement> history){
         this.humanPlayer = humanPlayer;
         this.machinePlayer = machinePlayer;
         this.end = end;
         this.started = started;
-        this.currentTurnPlayerName = currentTurnPlayerName;
-        this.history = new ArrayDeque<>(history);
+        this.cTurnPName = cTurnPName;
+        this.history = new Stack<>();
+        this.history.addAll(history);
     }
 
     /**
@@ -67,11 +67,11 @@ public class GameState implements Serializable {
      * Returns the name of the player whose turn it was.
      * @return current turn player's name
      */
-    public String getCurrentTurnPlayerName(){ return currentTurnPlayerName; }
+    public String getcTurnPName(){ return cTurnPName; }
 
     /**
      * Returns the saved move history.
      * @return the history of moves
      */
-    public Deque<Movement> getHistory(){ return history; }
+    public Stack<Movement> getHistory(){ return history; }
 }

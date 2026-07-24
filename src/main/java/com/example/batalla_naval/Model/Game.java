@@ -13,7 +13,7 @@ public class Game {
     private Player cTurn;
     private boolean end;
     private boolean started;
-    private Deque<Movement> history = new ArrayDeque<>();
+    private Stack<Movement> history = new Stack<>();
     private Queue<Player> turnQueue = new LinkedList<>();
 
     /**
@@ -41,9 +41,10 @@ public class Game {
         this.mPlayer = state.getMachinePlayer();
         this.end = state.isEnd();
         this.started = state.isStarted();
-        this.history = new ArrayDeque<>(state.getHistory());
+        this.history = new Stack<>();
+        this.history.addAll(state.getHistory());
 
-        if(state.getCurrentTurnPlayerName().equals(humaP.getName())){
+        if(state.getcTurnPName().equals(humaP.getName())){
             turnQueue.add(humaP);
             turnQueue.add(mPlayer);
         } else {
