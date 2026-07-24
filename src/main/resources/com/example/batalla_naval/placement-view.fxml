@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane stylesheets="@styles.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.batalla_naval.Controllers.PlacementController" styleClass="app-background">
+   <top>
+      <VBox alignment="CENTER" spacing="5.0" style="-fx-background-color: #0f172a; -fx-padding: 15px;">
+         <children>
+            <Label style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #f8fafc;" text="⚔ BATALLA NAVAL ⚔" />
+            <Label style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #38bdf8;" text="Fase: Colocación de Flota" />
+            <Label fx:id="statusLabel" style="-fx-font-size: 13px; -fx-text-fill: #cbd5e1;" text="Arrastra o haz clic para colocar tus 10 barcos. Pulsa R para rotar." textAlignment="CENTER" wrapText="true" />
+         </children>
+      </VBox>
+   </top>
+   <center>
+      <HBox alignment="CENTER" spacing="20.0" style="-fx-padding: 15px;">
+         <children>
+            <!-- Panel de colocación: dentro de un ScrollPane para que, si la
+                 ventana queda con poca altura disponible (por ejemplo por el
+                 escalado de pantalla), el contenido nunca quede cortado y
+                 siempre se pueda llegar a él con scroll -->
+            <ScrollPane fitToWidth="true" hbarPolicy="NEVER" prefViewportWidth="300.0" styleClass="side-scroll">
+               <content>
+                  <VBox prefWidth="300.0" spacing="12.0" styleClass="side-panel">
+                     <children>
+                        <Label style="-fx-font-weight: bold; -fx-font-size: 14px; -fx-text-fill: #f8fafc;" text="⚓ Colocación de Barcos" />
+
+                        <Label style="-fx-font-size: 12px; -fx-text-fill: #cbd5e1;" text="Orientación (o pulsa R):" />
+                        <HBox spacing="8.0">
+                           <children>
+                              <ToggleButton fx:id="radioHorizontal" maxWidth="1.7976931348623157E308" selected="true" styleClass="orientation-toggle" text="➡ Horizontal" HBox.hgrow="ALWAYS">
+                                 <toggleGroup>
+                                    <ToggleGroup fx:id="orientationGroup" />
+                                 </toggleGroup>
+                              </ToggleButton>
+                              <ToggleButton fx:id="radioVertical" maxWidth="1.7976931348623157E308" styleClass="orientation-toggle" text="⬇ Vertical" toggleGroup="$orientationGroup" HBox.hgrow="ALWAYS" />
+                           </children>
+                        </HBox>
+
+                        <Label style="-fx-font-size: 12px; -fx-text-fill: #cbd5e1;" text="Arrastra un barco al tablero:" />
+                        <VBox fx:id="shipCardsBox" spacing="10.0" />
+
+                        <Button fx:id="btnStartGame" disable="true" maxWidth="1.7976931348623157E308" styleClass="action-button" text="▶ Iniciar Batalla" />
+
+                        <Button fx:id="btnShowOpponent" maxWidth="1.7976931348623157E308" styleClass="secondary-button" text="👁 Ver Tablero Oponente" />
+                     </children>
+                  </VBox>
+               </content>
+            </ScrollPane>
+
+            <!-- Tablero de posición del jugador: sin fondo blanco, se ve la
+                 textura de fondo detras de las celdas -->
+            <GridPane fx:id="humanGrid" alignment="CENTER" styleClass="board-frame" />
+         </children>
+      </HBox>
+   </center>
+</BorderPane>

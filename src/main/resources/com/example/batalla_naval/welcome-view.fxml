@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<StackPane stylesheets="@styles.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.batalla_naval.Controllers.WelcomeController" styleClass="app-background">
+   <children>
+      <VBox alignment="CENTER" maxHeight="-Infinity" maxWidth="380.0" spacing="14.0" style="-fx-background-color: rgba(15, 23, 42, 0.78); -fx-padding: 30px; -fx-border-color: #334155; -fx-border-radius: 12px; -fx-background-radius: 12px;">
+         <children>
+            <Label style="-fx-font-size: 26px; -fx-font-weight: bold; -fx-text-fill: #f8fafc;" text="⚔ BATALLA NAVAL ⚔" />
+            <Label style="-fx-font-size: 12px; -fx-text-fill: #cbd5e1;" text="Ingresa tu nombre de comandante para empezar" textAlignment="CENTER" wrapText="true" />
+            <TextField fx:id="nicknameField" promptText="Tu nickname" />
+            <Label fx:id="savedInfoLabel" managed="false" style="-fx-font-size: 12px; -fx-text-fill: #38bdf8;" textAlignment="CENTER" visible="false" wrapText="true" />
+            <Button fx:id="btnNewGame" maxWidth="1.7976931348623157E308" styleClass="action-button" text="🚀 Nueva Partida" />
+            <Button fx:id="btnContinueGame" managed="false" maxWidth="1.7976931348623157E308" styleClass="secondary-button" text="🔄 Continuar Partida Guardada" visible="false" />
+            <Label fx:id="errorLabel" style="-fx-font-size: 11px; -fx-text-fill: #f87171;" textAlignment="CENTER" wrapText="true" />
+         </children>
+      </VBox>
+   </children>
+</StackPane>

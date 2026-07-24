@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<StackPane fx:id="rootPane" stylesheets="@styles.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.batalla_naval.Controllers.BattleController">
+   <children>
+      <BorderPane styleClass="app-background">
+         <top>
+            <VBox alignment="CENTER" spacing="5.0" style="-fx-background-color: #0f172a; -fx-padding: 15px;">
+               <children>
+                  <Label style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #f8fafc;" text="⚔ BATALLA NAVAL ⚔" />
+                  <Label fx:id="turnLabel" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #38bdf8;" text="Turno: Jugador" />
+                  <Label fx:id="statusLabel" style="-fx-font-size: 13px; -fx-text-fill: #cbd5e1;" text="⚔ ¡La batalla ha comenzado!" textAlignment="CENTER" wrapText="true" />
+               </children>
+            </VBox>
+         </top>
+         <center>
+            <HBox alignment="CENTER" spacing="20.0" style="-fx-padding: 15px;">
+               <children>
+                  <VBox spacing="8.0">
+                     <children>
+                        <Label style="-fx-font-weight: bold; -fx-font-size: 12px; -fx-text-fill: #f8fafc;" text="🛡 Tu Tablero (Posición)" />
+                        <GridPane fx:id="humanGrid" alignment="CENTER" styleClass="board-frame" />
+                     </children>
+                  </VBox>
+
+                  <VBox spacing="8.0">
+                     <children>
+                        <Label style="-fx-font-weight: bold; -fx-font-size: 12px; -fx-text-fill: #f8fafc;" text="🎯 Tablero del Oponente (Ataque)" />
+                        <GridPane fx:id="machineGrid" alignment="CENTER" styleClass="board-frame" />
+                     </children>
+                  </VBox>
+
+                  <VBox prefWidth="220.0" spacing="8.0">
+                     <children>
+                        <Label style="-fx-font-weight: bold; -fx-font-size: 12px; -fx-text-fill: #f8fafc;" text="📜 Registro de Jugadas" />
+                        <ListView fx:id="logListView" VBox.vgrow="ALWAYS" />
+                     </children>
+                  </VBox>
+               </children>
+            </HBox>
+         </center>
+      </BorderPane>
+
+      <VBox fx:id="winnerOverlay" alignment="CENTER" maxHeight="300.0" maxWidth="450.0" spacing="20.0" styleClass="winner-overlay" visible="false">
+         <children>
+            <Label fx:id="winnerLabel" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #38bdf8;" text="¡Has Ganado!" textAlignment="CENTER" wrapText="true" />
+            <Button fx:id="btnNewGame" styleClass="action-button" text="🔄 Jugar Nueva Partida" />
+         </children>
+      </VBox>
+   </children>
+</StackPane>

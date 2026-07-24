@@ -1,7 +1,136 @@
 /* ESTILOS BATALLA NAVAL */
 
+/* Fuente Bosman: se usa en toda la aplicacion para un look mas dinamico/militar */
+@font-face {
+    src: url("fonts/Bosman-Black.otf");
+}
+@font-face {
+    src: url("fonts/Bosman-Stripes.otf");
+}
+@font-face {
+    src: url("fonts/Bosman-Dings.otf");
+}
+@font-face {
+    src: url("fonts/Bosman-Empty.otf");
+}
+
 .root {
-    -fx-font-family: 'Segoe UI', Helvetica, Arial, sans-serif;
+    -fx-font-family: "Bosman Black";
+}
+
+/* Fondo con textura de mar profundo, repetida en mosaico */
+.app-background {
+    -fx-background-color: #0f172a;
+    -fx-background-image: url("images/background.png");
+    -fx-background-repeat: repeat;
+    -fx-background-size: 512px 512px;
+}
+
+/* Panel lateral traslucido para que la textura se note detras */
+.side-panel {
+    -fx-background-color: rgba(15, 23, 42, 0.72);
+    -fx-padding: 15px;
+    -fx-border-color: #334155;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+}
+
+/* ScrollPane transparente para que el panel lateral pueda desplazarse
+   sin tapar la textura de fondo ni mostrar el blanco por defecto de JavaFX */
+.side-scroll,
+.side-scroll > .viewport {
+    -fx-background-color: transparent;
+}
+
+.side-scroll .scroll-bar:vertical {
+    -fx-background-color: transparent;
+    -fx-pref-width: 10px;
+}
+
+.side-scroll .scroll-bar:vertical .thumb {
+    -fx-background-color: #38bdf8;
+    -fx-background-radius: 5px;
+}
+
+.side-scroll .scroll-bar:vertical .track {
+    -fx-background-color: transparent;
+}
+
+/* Contenedor de los tableros: ya no es blanco, deja ver la textura de
+   fondo detras y solo aporta un marco translucido */
+.board-frame {
+    -fx-background-color: rgba(15, 23, 42, 0.35);
+    -fx-padding: 10px;
+    -fx-border-color: rgba(148, 163, 184, 0.45);
+    -fx-border-width: 2px;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+}
+
+/* Botones de orientación (Horizontal / Vertical) */
+.orientation-toggle {
+    -fx-background-color: #1e293b;
+    -fx-text-fill: #cbd5e1;
+    -fx-border-color: #334155;
+    -fx-border-width: 2px;
+    -fx-border-radius: 6px;
+    -fx-background-radius: 6px;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-padding: 8px 4px;
+    -fx-cursor: hand;
+}
+
+.orientation-toggle:hover {
+    -fx-border-color: #38bdf8;
+}
+
+.orientation-toggle:selected {
+    -fx-background-color: #0284c7;
+    -fx-text-fill: #ffffff;
+    -fx-border-color: #38bdf8;
+}
+
+/* Tarjeta de barco arrastrable, con vista previa */
+.ship-card {
+    -fx-background-color: #1e293b;
+    -fx-border-color: #334155;
+    -fx-border-width: 2px;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+    -fx-padding: 10px;
+    -fx-cursor: open-hand;
+}
+
+.ship-card:hover {
+    -fx-background-color: #24344d;
+    -fx-border-color: #38bdf8;
+}
+
+/* Tarjeta seleccionada como tipo activo (para colocar con clic) */
+.ship-card-active {
+    -fx-border-color: #38bdf8;
+    -fx-background-color: #24344d;
+}
+
+.ship-card-preview-box {
+    -fx-background-color: #0f172a;
+    -fx-background-radius: 6px;
+    -fx-min-width: 90px;
+    -fx-min-height: 90px;
+    -fx-max-width: 90px;
+    -fx-max-height: 90px;
+}
+
+.ship-card-name {
+    -fx-font-weight: bold;
+    -fx-font-size: 13px;
+    -fx-text-fill: #f8fafc;
+}
+
+.ship-card-count {
+    -fx-font-size: 12px;
+    -fx-text-fill: #94a3b8;
 }
 
 /* Celdas de tablero */
@@ -12,11 +141,12 @@
     -fx-pref-height: 32px;
     -fx-max-width: 32px;
     -fx-max-height: 32px;
-    -fx-background-color: #0f172a;
-    -fx-border-color: #334155;
+    -fx-background-color: rgba(241, 245, 249, 0.85);
+    -fx-border-color: #1e293b;
     -fx-border-width: 1px;
     -fx-font-size: 11px;
     -fx-font-weight: bold;
+    -fx-text-fill: #0f172a;
     -fx-alignment: center;
     -fx-cursor: hand;
     -fx-background-radius: 2px;
@@ -24,7 +154,7 @@
 }
 
 .grid-cell:hover {
-    -fx-background-color: #1e293b;
+    -fx-background-color: #ffffff;
     -fx-border-color: #38bdf8;
 }
 
